@@ -15,6 +15,11 @@ const users = ref([]);
 
 const showme = ref(false);
 
+const formValues = ref([]);
+
+// This will help reset the form when we we want to edit it.
+const resetform = ref(null);
+
 const getUsers = () => {
     axios.get('/api/users').then((response) => {
         users.value = response.data;
@@ -34,12 +39,16 @@ const storeauser = () =>{
     // Form represents where it is being stored.
 };
 
-const editUser = () =>{
-    //  showme.value = true;
-    $('#userFormModal').modal('show');
-    checkstatus.value = true;
-
-}
+const editUser = (user) => {
+  checkstatus.value = true;
+  resetform.value.resetForm();
+  $('#userFormModal').modal('show');
+  formValues.value = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+ };
+};
 
 const adduserbutton = () =>{
     //  showme.value = true;
@@ -95,7 +104,7 @@ onMounted(()=> {
                         <tbody>
                             <tr v-for="(user, index) in users" :key="user.id">
                                 <td> - </td>
-                                <td> {{ index }} </td>
+                                <td> {{ index + 1}} </td>
                                 <td> {{ user.name }} </td>
                                 <td> {{ user.email }}</td>
                                 <td> - </td>
@@ -126,19 +135,19 @@ onMounted(()=> {
                     </button>
                 </div>
 
-                <Form @submit="submit" :validation-schema="schema" v-slot="{errors}">
+                <Form ref="resetform" @submit="storeauser" :validation-schema="schema" v-slot="{errors}" :initial-values="formValues">
                 <div class="modal-body">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <Field name="name" type="text" class="form-control " id="name"
-                                aria-describedby="nameHelp" placeholder="Enter full name" />
+                                aria-describedby="nameHelp" v-model="formValues.name" placeholder="Enter full name" />
                                <span style="color: red; font-size: 14px"> <ErrorMessage name="name" />  </span>
                             </div>
 
                         <div class="form-group">
                             <label for="email">Email</label>
                             <Field name="email" type="email" class="form-control " id="email"
-                                aria-describedby="nameHelp" placeholder="Enter full name" :class="{'is-invalid' : errors.email}" />
+                                aria-describedby="nameHelp" v-model="formValues.name"  placeholder="Enter full name" :class="{'is-invalid' : errors.email}" />
                                <span> <ErrorMessage name="email" />  </span>
                             </div>
 
