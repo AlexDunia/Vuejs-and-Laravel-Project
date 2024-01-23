@@ -5,6 +5,7 @@ import { ref, onMounted, reactive } from 'vue';
 const showme = ref(false);
 
 const clickme = () => {
+    // as a ref, value must always be added to make it reactive. Very simple.
     showme.value = !showme.value;
 };
 

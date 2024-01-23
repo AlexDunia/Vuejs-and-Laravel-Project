@@ -9,9 +9,11 @@ const schema = yup.object({
   password: yup.string().min(6).required(),
 });
 
+const checkstatus = ref(false);
+
 const users = ref([]);
 
-const showm = ref(false);
+const showme = ref(false);
 
 const getUsers = () => {
     axios.get('/api/users').then((response) => {
@@ -32,8 +34,18 @@ const storeauser = () =>{
     // Form represents where it is being stored.
 };
 
-const editUser = (user) =>{
-     showm.value = true;
+const editUser = () =>{
+    //  showme.value = true;
+    $('#userFormModal').modal('show');
+    checkstatus.value = true;
+
+}
+
+const adduserbutton = () =>{
+    //  showme.value = true;
+    $('#userFormModal').modal('show');
+    checkstatus.value = false;
+
 }
 
 const form = reactive({
@@ -59,7 +71,7 @@ onMounted(()=> {
     <div class="content">
         <div class="container-fluid">
 
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModel">
+<button @click="adduserbutton" type="button" class="btn btn-primary">
     Add New User
   </button>
 
@@ -100,12 +112,15 @@ onMounted(()=> {
 </div>
 
 <!-- Modal template -->
-<div class="modal fade" id="createUserModel" data-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true" v-if="showm.value">
+<div class="modal fade" id="userFormModal" data-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Add New User</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                       <span v-if="checkstatus">  Edit User </span>
+                       <span v-else>  Add New User </span>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
