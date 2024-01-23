@@ -11,24 +11,30 @@ const schema = yup.object({
 
 const users = ref([]);
 
+const showm = ref(false);
+
 const getUsers = () => {
     axios.get('/api/users').then((response) => {
         users.value = response.data;
     })
 }
 
-// const storeauser = () =>{
-//     axios.post('/post/user', form)
-//     .then((response) => {
-//         users.value.unshift(response.data);
-//         form.name = '';
-//         form.email = '';
-//         form.password = '';
-//     });
-//     // With this code only, you can now
-//     // send a post request
-//     // Form represents where it is being stored.
-// };
+const storeauser = () =>{
+    axios.post('/post/user', form)
+    .then((response) => {
+        users.value.unshift(response.data);
+        form.name = '';
+        form.email = '';
+        form.password = '';
+    });
+    // With this code only, you can now
+    // send a post request
+    // Form represents where it is being stored.
+};
+
+const editUser = (user) =>{
+     showm.value = true;
+}
 
 const form = reactive({
     name : '',
@@ -82,7 +88,8 @@ onMounted(()=> {
                                 <td> {{ user.email }}</td>
                                 <td> - </td>
                                 <td> - </td>
-                                <td> - </td>
+                                <td>
+                                    <a href="#" @click.prevent="editUser(user)"> <i class="fa fa-edit"> </i> </a> </td>
                                 <!-- <td colspan="6" class="text-center">No results found...</td> -->
                             </tr>
                         </tbody>
@@ -94,7 +101,7 @@ onMounted(()=> {
 
 <!-- Modal template -->
 <div class="modal fade" id="createUserModel" data-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        aria-labelledby="staticBackdropLabel" aria-hidden="true" v-if="showm.value">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -129,7 +136,7 @@ onMounted(()=> {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button @click="storeauser" type="submit" class="btn btn-primary">Save</button>
                 </div>
 
             </Form>
