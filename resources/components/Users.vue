@@ -50,7 +50,7 @@ const storeauser = (form) =>{
 const handleuser = (values) => {
     if (checkstatus.value) {
         console.log(values);
-        axios.put('api/users/' + formValues.value.id, values)
+        axios.put('/api/users/' + formValues.value.id, values)
             .then((response) => {
                 const index = users.value.findIndex(user => user.id === response.data.id);
                 users.value[index] = response.data;

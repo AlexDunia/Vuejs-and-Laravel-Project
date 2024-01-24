@@ -32,6 +32,8 @@ class UserController extends Controller
           'email' => request('email'),
           'password' => request('password') ? bcrypt(request('password')) : $user->password,
         ]);
+
+        return $user;
       }
 
 }
