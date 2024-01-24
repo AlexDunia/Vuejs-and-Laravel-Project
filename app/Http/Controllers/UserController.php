@@ -18,11 +18,20 @@ class UserController extends Controller
         $formfield = $request->validate([
           'name'=>'required',
           'email'=>['required', 'email', Rule::unique('users', 'email')],
-          'password'=> 'required|min:6'
+          'password'=> 'required|min:8'
       ]);
       $formfield['password'] = bcrypt($formfield['password']);
       $user = User::create($formfield);
 
         return $user;
       }
+
+      public function update(User $user){
+        $user->update([
+          'name' => request('name'),
+          'email' => request('email'),
+          'password' => request('password') ? bcrypt(request('password')) : $user->password,
+        ]);
+      }
+
 }

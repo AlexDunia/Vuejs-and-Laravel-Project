@@ -27,3 +27,5 @@ Route::post('/post/user', [UserController::class, 'storeuser']);
 // we need a conditional here.
 // Where thsi view can be zero or more of any characters.
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
+
+Route::PUT('/api/users/{user}', [UserController::class, 'update']);

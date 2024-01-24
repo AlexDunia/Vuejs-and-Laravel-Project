@@ -3,10 +3,18 @@ import { ref, onMounted, reactive } from 'vue';
 import { Field, Form, ErrorMessage } from 'vee-validate';
 import * as yup from 'yup';
 
-const schema = yup.object({
+const createschema = yup.object({
   name: yup.string().required(),
   email: yup.string().required(),
-  password: yup.string().min(6).required(),
+  password: yup.string().min(8).required(),
+});
+
+const editSchema = yup.object({
+  name: yup.string().required(),
+  email: yup.string().required(),
+  password: yup.string().when((password, schema) =>{
+    return password ? schema.min(8) : schema;
+  }),
 });
 
 const checkstatus = ref(false);
@@ -26,18 +34,39 @@ const getUsers = () => {
     })
 }
 
-const storeauser = () =>{
+const storeauser = (form) =>{
     axios.post('/post/user', form)
     .then((response) => {
         users.value.unshift(response.data);
-        form.name = '';
-        form.email = '';
-        form.password = '';
+        // form.name = '';
+        // form.email = '';
+        // form.password = '';
     });
     // With this code only, you can now
     // send a post request
     // Form represents where it is being stored.
 };
+
+const handleuser = (values) => {
+    if (checkstatus.value) {
+        console.log(values);
+        axios.put('api/users/' + formValues.value.id, values)
+            .then((response) => {
+                const index = users.value.findIndex(user => user.id === response.data.id);
+                users.value[index] = response.data;
+                $('#userFormModal').modal('hide');
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+            .finally(() => {
+                resetform.value.resetForm(); // Assuming resetform is a ref pointing to the form instance
+            });
+    } else {
+        storeauser(values);
+    }
+};
+
 
 const editUser = (user) => {
   checkstatus.value = true;
@@ -135,32 +164,33 @@ onMounted(()=> {
                     </button>
                 </div>
 
-                <Form ref="resetform" @submit="storeauser" :validation-schema="schema" v-slot="{errors}" :initial-values="formValues">
+                <Form ref="resetform" @submit="handleuser" :validation-schema="checkstatus ? editSchema : createschema" v-slot="{errors}" :initial-values="formValues">
                 <div class="modal-body">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <Field name="name" type="text" class="form-control " id="name"
                                 aria-describedby="nameHelp" v-model="formValues.name" placeholder="Enter full name" />
-                               <span style="color: red; font-size: 14px"> <ErrorMessage name="name" />  </span>
+                               <span style="color: red; font-size: 14px">{{ errors.name }}  </span>
                             </div>
 
                         <div class="form-group">
                             <label for="email">Email</label>
                             <Field name="email" type="email" class="form-control " id="email"
-                                aria-describedby="nameHelp" v-model="formValues.name"  placeholder="Enter full name" :class="{'is-invalid' : errors.email}" />
-                               <span> <ErrorMessage name="email" />  </span>
+                                aria-describedby="nameHelp" v-model="formValues.email"  placeholder="Enter full name" :class="{'is-invalid' : errors.email}" />
+                               <span> {{ errors.email }}</span>
                             </div>
 
                     <div class="form-group">
                         <label for="email">Password</label>
                         <Field name="password" type="password" class="form-control " id="password"
                             aria-describedby="nameHelp" placeholder="Enter password"/>
-                            <span> <ErrorMessage name="email" />  </span>
+                            <!-- <span> <ErrorMessage name="password" />  </span> -->
+                            <span> {{ errors.password }} </span>
                          </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button @click="storeauser" type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
 
             </Form>
